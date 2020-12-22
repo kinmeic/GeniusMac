@@ -8,8 +8,16 @@ from PIL import Image
 processList = []
 
 # 定义取色坐标
-captureX = 15
-captureY = 15
+captureX = 5
+captureY = 35
+
+# 定义按键
+keyMapping = [
+    (10, '1'), (15, '2'), (20, '3'), (25, '4'), (30, '5'), (35, '6'),
+    (40, '7'), (45, '8'), (50, '9'), (55, '0'), (60, '-'), (65, '='),
+    (70, 'f1'), (75, 'f2'), (80, 'f3'), (85, 'f4'), (90, 'f5'), (95, 'f6'),
+    (100, 'f7'), (105, 'f8'), (110, 'f9'), (115, 'f10'), (120, 'f11'), (125, 'f12')
+]
 
 # 获取进程列表并等待用户选择
 def ListProcess():
@@ -44,9 +52,12 @@ def ListProcess():
 
 # 捕获核心逻辑
 def capture(winNumber):
+    lastRed = 0
+    lastGreen = 0
+    lastBlue = 0
+
     # 获取激活的窗口
-    #while True:
-    for i in range(100000):
+    while True:
         starttime = time.time()
 
         # 获取传入窗口的详细信息
@@ -101,68 +112,24 @@ def capture(winNumber):
             elif colorMethod == 3:
                 pyautogui.write("hello world!")
 
-
-            print(colorRed, colorGreen, colorBlue)
+            if lastRed != colorRed or lastGreen != colorGreen or lastBlue != colorBlue:
+                lastRed = colorRed
+                lastGreen = colorGreen
+                lastBlue = colorBlue
+                print('Color Change to ', colorRed, colorGreen, colorBlue)
 
             # 符合颜色过滤条件，根据r的值发送按键
-            if colorGreen == 6 and colorBlue == 0:
-                if colorRed == 10:
-                    pyautogui.press("1")
-                elif colorRed == 15:
-                    pyautogui.press("2")
-                elif colorRed == 20:
-                    pyautogui.press("3")
-                elif colorRed == 25:
-                    pyautogui.press("4")
-                elif colorRed == 30:
-                    pyautogui.press("5")
-                elif colorRed == 35:
-                    pyautogui.press("6")
-                elif colorRed == 40:
-                    pyautogui.press("7")
-                elif colorRed == 45:
-                    pyautogui.press("8")
-                elif colorRed == 50:
-                    pyautogui.press("9")
-                elif colorRed == 55:
-                    pyautogui.press("0")
-                elif colorRed == 60:
-                    pyautogui.press("-")
-                elif colorRed == 65:
-                    pyautogui.press("=")
-                elif colorRed == 65:
-                    pyautogui.press("=")
-                elif colorRed == 65:
-                    pyautogui.press("=")
-                elif colorRed == 70:
-                    pyautogui.press("f1")
-                elif colorRed == 75:
-                    pyautogui.press("f2")
-                elif colorRed == 80:
-                    pyautogui.press("f3")
-                elif colorRed == 85:
-                    pyautogui.press("f4")
-                elif colorRed == 90:
-                    pyautogui.press("f5")
-                elif colorRed == 95:
-                    pyautogui.press("f6")
-                elif colorRed == 100:
-                    pyautogui.press("f7")
-                elif colorRed == 105:
-                    pyautogui.press("f8")
-                elif colorRed == 110:
-                    pyautogui.press("f9")
-                elif colorRed == 115:
-                    pyautogui.press("f10")
-                elif colorRed == 120:
-                    pyautogui.press("f11")
-                elif colorRed == 125:
-                    pyautogui.press("f12")
+            if 4 <= colorGreen <= 8 and colorBlue < 3:
+                for (color, key) in keyMapping:
+                    if color - 3 < colorRed < color + 3:
+                        print("Press key: ", key)
+                        pyautogui.press(key)
+                        break
 
-            endtime = time.time()
-            elasped = endtime - starttime
-            print('done! in ' + str(elasped) + 's')
-            #time.sleep(0.2)
+            #endtime = time.time()
+            #elasped = endtime - starttime
+            #print('done! in ' + str(elasped) + 's')
+            time.sleep(0.2)
         else:
             print("目标窗口未激活，等待中...")
             time.sleep(2)
@@ -196,4 +163,3 @@ if __name__ == '__main__':
             capture(winNumber)
         except KeyboardInterrupt:
             print("监控结束。")
-
