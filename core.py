@@ -52,9 +52,9 @@ def ListProcess():
 
 # 捕获核心逻辑
 def capture(winNumber):
-    lastRed = 0
-    lastGreen = 0
-    lastBlue = 0
+    lastRed = 255
+    lastGreen = 255
+    lastBlue = 255
 
     # 获取激活的窗口
     while True:
@@ -98,9 +98,11 @@ def capture(winNumber):
             colorMethod = 1
 
             if colorMethod == 0:
+                # 较慢
                 image = Image.frombytes("RGBA", (width, height), data)
                 (colorBlue, colorGreen, colorRed, a) = image.getpixel((x, y))
             elif colorMethod == 1:
+                # 较快
                 offset = 4 * ((width * int(round(y))) + int(round(x)))
                 colorBlue, colorGreen, colorRed, a = struct.unpack_from("BBBB", data, offset=offset)
             elif colorMethod == 2:
@@ -110,7 +112,11 @@ def capture(winNumber):
                 img1.show()
                 break
             elif colorMethod == 3:
-                pyautogui.write("hello world!")
+                #pyautogui.write("hello world!")
+                loc = pyautogui.locateOnScreen("indictor.png")
+                print(loc)
+                print(pyautogui.size())
+                print(width, height)
 
             if lastRed != colorRed or lastGreen != colorGreen or lastBlue != colorBlue:
                 lastRed = colorRed
@@ -132,6 +138,9 @@ def capture(winNumber):
             time.sleep(0.2)
         else:
             print("目标窗口未激活，等待中...")
+            lastRed = 255
+            lastGreen = 255
+            lastBlue = 255
             time.sleep(2)
 
 
