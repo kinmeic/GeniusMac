@@ -1,3 +1,4 @@
+import os
 import struct
 import time
 from Cocoa import NSWorkspace
@@ -36,7 +37,7 @@ def ListProcess():
     idx = 0
 
     # 打印标题栏
-    print('{0}\t{1:>10s}\t{2:30s}'.format('序号', 'PID', '进程名称'))
+    print('{0}\t{1:>10s}\t{2:30s}'.format('序号', 'PID', '窗口名称'))
 
     for win in winList:
         name = win.get('kCGWindowName', '')
@@ -63,7 +64,8 @@ def capture(winNumber):
         # 获取传入窗口的详细信息
         winDesc = CG.CGWindowListCreateDescriptionFromArray([winNumber])[0]
         winPID = winDesc.get('kCGWindowOwnerPID', 0)
-        #winOwnerName = winDesc.get('kCGWindowOwnerName', '')
+        winName = winDesc.get("kCGWindowName", "")
+        winOwnerName = winDesc.get('kCGWindowOwnerName', '')
         winBounds = winDesc.get('kCGWindowBounds', '{}')
         winX = winBounds.get("X", 0)
         winY = winBounds.get("Y", 0)
@@ -137,7 +139,7 @@ def capture(winNumber):
             #print('done! in ' + str(elasped) + 's')
             time.sleep(0.2)
         else:
-            print("目标窗口未激活，等待中...")
+            print("目标窗口 [{0} - {1}] 未激活，等待中...".format(winName, winOwnerName))
             lastRed = 255
             lastGreen = 255
             lastBlue = 255
@@ -148,10 +150,11 @@ if __name__ == '__main__':
     winNumber = None
 
     # 显示正在运行的进程列表并提示用户选择
-    print("Listing process...")
-    ListProcess()
-
     while True:
+        os.system('clear')
+        print("欢迎使用 Genius for Mac 1.0")
+        print("================================")
+        ListProcess()
         data = input("请输入需要监控的序号:")
 
         try:
@@ -168,7 +171,10 @@ if __name__ == '__main__':
     # 启动捕获逻辑
     if winNumber is not None:
         try:
-            print("开始监控...")
+            os.system('clear')
+            print("欢迎使用 Genius for Mac 1.0")
+            print("================================")
+            print("开始监控（可以按Ctrl+C退出）...")
             capture(winNumber)
         except KeyboardInterrupt:
             print("监控结束。")
