@@ -154,8 +154,9 @@ def capture(winNumber):
                 time.sleep(0.3)
             else:
                 # 符合颜色过滤条件，根据r的值发送按键
+                # 苹果的截图，不同设备截出来的颜色都会不一样，用genius test D1来测试按键
                 for item in keysDict:
-                    if item["r"] == colorRed and item["g"] == colorGreen and item["b"] == colorBlue:
+                    if colorRed - 1 <= item["r"] <= colorRed + 1 and item["g"] == colorGreen and item["b"] == colorBlue:
                         print("Press key: ", item["key"])
                         pyautogui.press(item["key"])
                         break
