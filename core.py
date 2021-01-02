@@ -11,9 +11,13 @@ processList = []
 captureX = 5
 captureY = 35
 
-# 定义按键
+colorMode = "SRGB"
 
-keysDict = [
+# 定义按键
+keysDict = {}
+
+# 苹果iMac颜色模式
+keysDict["iMac"] = [
     {"r": 10, "g": 6, "b": 1, "key": "1"},
     {"r": 14, "g": 6, "b": 1, "key": "2"},
     {"r": 18, "g": 7, "b": 1, "key": "3"},
@@ -38,6 +42,34 @@ keysDict = [
     {"r": 105, "g": 21, "b": 10, "key": "f10"},
     {"r": 110, "g": 22, "b": 11, "key": "f11"},
     {"r": 114, "g": 23, "b": 12, "key": "f12"}
+]
+
+# 设置显示器颜色描述文件为SRGB
+keysDict["SRGB"] = [
+    {"r": 10, "g": 6, "b": 0, "key": "1"},
+    {"r": 15, "g": 6, "b": 0, "key": "2"},
+    {"r": 20, "g": 6, "b": 0, "key": "3"},
+    {"r": 25, "g": 6, "b": 0, "key": "4"},
+    {"r": 30, "g": 6, "b": 0, "key": "5"},
+    {"r": 35, "g": 6, "b": 0, "key": "6"},
+    {"r": 40, "g": 6, "b": 0, "key": "7"},
+    {"r": 45, "g": 6, "b": 0, "key": "8"},
+    {"r": 50, "g": 6, "b": 0, "key": "9"},
+    {"r": 55, "g": 6, "b": 0, "key": "0"},
+    {"r": 60, "g": 6, "b": 0, "key": "-"},
+    {"r": 65, "g": 6, "b": 0, "key": "="},
+    {"r": 70, "g": 6, "b": 0, "key": "f1"},
+    {"r": 75, "g": 6, "b": 0, "key": "f2"},
+    {"r": 80, "g": 6, "b": 0, "key": "f3"},
+    {"r": 85, "g": 6, "b": 0, "key": "f4"},
+    {"r": 90, "g": 6, "b": 0, "key": "f5"},
+    {"r": 95, "g": 6, "b": 0, "key": "f6"},
+    {"r": 100, "g": 6, "b": 0, "key": "f7"},
+    {"r": 105, "g": 6, "b": 0, "key": "f8"},
+    {"r": 110, "g": 6, "b": 0, "key": "f9"},
+    {"r": 115, "g": 6, "b": 0, "key": "f10"},
+    {"r": 120, "g": 6, "b": 0, "key": "f11"},
+    {"r": 125, "g": 6, "b": 0, "key": "f12"}
 ]
 
 # 获取进程列表并等待用户选择
@@ -155,7 +187,7 @@ def capture(winNumber):
             else:
                 # 符合颜色过滤条件，根据r的值发送按键
                 # 苹果的截图，不同设备截出来的颜色都会不一样，用genius test D1来测试按键
-                for item in keysDict:
+                for item in keysDict[colorMode]:
                     if colorRed - 1 <= item["r"] <= colorRed + 1 and item["g"] == colorGreen and item["b"] == colorBlue:
                         print("Press key: ", item["key"])
                         pyautogui.press(item["key"])
