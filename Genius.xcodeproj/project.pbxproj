@@ -1,0 +1,372 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		3CCFFABD3C207301B0A6A102 /* PixelMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FDFBEE13B365CCC0E188E86 /* PixelMonitor.swift */; };
+		3CE37DADFDBB33EFB237B8A6 /* GeniusMacApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC910F5C322CE21B0004836C /* GeniusMacApp.swift */; };
+		48253B02564375857BB345FA /* ProcessManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4588A656F87D1F98B7DF3BB3 /* ProcessManager.swift */; };
+		5E0494C60C5BC83AF77149CA /* ConfigService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24CB15C6CAC5FF085C11F4B6 /* ConfigService.swift */; };
+		8A4FDB3122AF8175052B6E91 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77B885E8BA88E7D5AB02AA35 /* SettingsView.swift */; };
+		908489F2AE87C4B05F5E44A4 /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60D01687F2431B7B8A98AB58 /* MainView.swift */; };
+		C289FCDEA4B311D90C54383A /* KeySimulator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83C335971C1216F0B98F77B0 /* KeySimulator.swift */; };
+		C7E6CB0F4C32DB19EA424EE7 /* Config.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E48C377E14FA6A37BE2DEF5 /* Config.swift */; };
+		C8D88F2D99259171869333D3 /* CaptureEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDB55C163D8482D11344725A /* CaptureEvent.swift */; };
+		DD92BC50BB52607AEF75C455 /* WindowObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E8C0673BCDD1A9F493BECEE /* WindowObserver.swift */; };
+		F280CD8B8F51B53C298345C9 /* KeyMapping.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CB480A5A75DE044AC325B26 /* KeyMapping.swift */; };
+		F597CEF39A0D16CACF5266EE /* KeyCode+Common.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADF0ADDB6A95430F938E1B0F /* KeyCode+Common.swift */; };
+		FDF6CAE8DF5C6BAB21D9F586 /* PermissionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3656360B9D0A7056431EA8C /* PermissionService.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		1E48C377E14FA6A37BE2DEF5 /* Config.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Config.swift; sourceTree = "<group>"; };
+		24CB15C6CAC5FF085C11F4B6 /* ConfigService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigService.swift; sourceTree = "<group>"; };
+		2CB480A5A75DE044AC325B26 /* KeyMapping.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyMapping.swift; sourceTree = "<group>"; };
+		3E8C0673BCDD1A9F493BECEE /* WindowObserver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WindowObserver.swift; sourceTree = "<group>"; };
+		4588A656F87D1F98B7DF3BB3 /* ProcessManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProcessManager.swift; sourceTree = "<group>"; };
+		4FDFBEE13B365CCC0E188E86 /* PixelMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PixelMonitor.swift; sourceTree = "<group>"; };
+		60D01687F2431B7B8A98AB58 /* MainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView.swift; sourceTree = "<group>"; };
+		77B885E8BA88E7D5AB02AA35 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		83C335971C1216F0B98F77B0 /* KeySimulator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeySimulator.swift; sourceTree = "<group>"; };
+		ADF0ADDB6A95430F938E1B0F /* KeyCode+Common.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "KeyCode+Common.swift"; sourceTree = "<group>"; };
+		BD876F6D899B48413581C31E /* GeniusMac.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GeniusMac.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		C3656360B9D0A7056431EA8C /* PermissionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PermissionService.swift; sourceTree = "<group>"; };
+		CDB55C163D8482D11344725A /* CaptureEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CaptureEvent.swift; sourceTree = "<group>"; };
+		DC910F5C322CE21B0004836C /* GeniusMacApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeniusMacApp.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		2D0135FAB838EE0EC09EF36C /* GeniusMac */ = {
+			isa = PBXGroup;
+			children = (
+				DC910F5C322CE21B0004836C /* GeniusMacApp.swift */,
+				DB2CB117A3682756AD3BF31D /* Core */,
+				C5B48DCCD201B6605268EEB1 /* Models */,
+				F1682AB3BAD1480D79FE1758 /* Services */,
+				6D8BFD354399E16BA82195E1 /* Views */,
+			);
+			path = GeniusMac;
+			sourceTree = "<group>";
+		};
+		38A41979BBC62FA1081F6F35 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				BD876F6D899B48413581C31E /* GeniusMac.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		6D8BFD354399E16BA82195E1 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				60D01687F2431B7B8A98AB58 /* MainView.swift */,
+				77B885E8BA88E7D5AB02AA35 /* SettingsView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		C5B48DCCD201B6605268EEB1 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				CDB55C163D8482D11344725A /* CaptureEvent.swift */,
+				1E48C377E14FA6A37BE2DEF5 /* Config.swift */,
+				2CB480A5A75DE044AC325B26 /* KeyMapping.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		D4B8ACF47BC00137D08A22E9 = {
+			isa = PBXGroup;
+			children = (
+				2D0135FAB838EE0EC09EF36C /* GeniusMac */,
+				38A41979BBC62FA1081F6F35 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		DB2CB117A3682756AD3BF31D /* Core */ = {
+			isa = PBXGroup;
+			children = (
+				ADF0ADDB6A95430F938E1B0F /* KeyCode+Common.swift */,
+				83C335971C1216F0B98F77B0 /* KeySimulator.swift */,
+				4FDFBEE13B365CCC0E188E86 /* PixelMonitor.swift */,
+				4588A656F87D1F98B7DF3BB3 /* ProcessManager.swift */,
+				3E8C0673BCDD1A9F493BECEE /* WindowObserver.swift */,
+			);
+			path = Core;
+			sourceTree = "<group>";
+		};
+		F1682AB3BAD1480D79FE1758 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				24CB15C6CAC5FF085C11F4B6 /* ConfigService.swift */,
+				C3656360B9D0A7056431EA8C /* PermissionService.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		4D354D5870906293658A378F /* GeniusMac */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F1B168A36D79836B935D5846 /* Build configuration list for PBXNativeTarget "GeniusMac" */;
+			buildPhases = (
+				0B7305A66B1D4EE740B12A73 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = GeniusMac;
+			packageProductDependencies = (
+			);
+			productName = GeniusMac;
+			productReference = BD876F6D899B48413581C31E /* GeniusMac.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		311BA52C6BB14BB04F3041EE /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+				};
+			};
+			buildConfigurationList = AD9BD7C9C252CA6E3B099152 /* Build configuration list for PBXProject "Genius" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = D4B8ACF47BC00137D08A22E9;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 38A41979BBC62FA1081F6F35 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				4D354D5870906293658A378F /* GeniusMac */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		0B7305A66B1D4EE740B12A73 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C8D88F2D99259171869333D3 /* CaptureEvent.swift in Sources */,
+				C7E6CB0F4C32DB19EA424EE7 /* Config.swift in Sources */,
+				5E0494C60C5BC83AF77149CA /* ConfigService.swift in Sources */,
+				3CE37DADFDBB33EFB237B8A6 /* GeniusMacApp.swift in Sources */,
+				F597CEF39A0D16CACF5266EE /* KeyCode+Common.swift in Sources */,
+				F280CD8B8F51B53C298345C9 /* KeyMapping.swift in Sources */,
+				C289FCDEA4B311D90C54383A /* KeySimulator.swift in Sources */,
+				908489F2AE87C4B05F5E44A4 /* MainView.swift in Sources */,
+				FDF6CAE8DF5C6BAB21D9F586 /* PermissionService.swift in Sources */,
+				3CCFFABD3C207301B0A6A102 /* PixelMonitor.swift in Sources */,
+				48253B02564375857BB345FA /* ProcessManager.swift in Sources */,
+				8A4FDB3122AF8175052B6E91 /* SettingsView.swift in Sources */,
+				DD92BC50BB52607AEF75C455 /* WindowObserver.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		021EAB743568CD899622906D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.9;
+			};
+			name = Debug;
+		};
+		2475E3224C5C751C599FED7C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.9;
+			};
+			name = Release;
+		};
+		4C8920BD28962BE3F238CBD7 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = GeniusMac/Resources/GeniusMac.entitlements;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_HARDENED_RUNTIME = NO;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = GeniusMac/Resources/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.genius.mac;
+				PRODUCT_NAME = GeniusMac;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		5FF0BE59ECA68909BBAC3DBD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = GeniusMac/Resources/GeniusMac.entitlements;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_HARDENED_RUNTIME = NO;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = GeniusMac/Resources/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.genius.mac;
+				PRODUCT_NAME = GeniusMac;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		AD9BD7C9C252CA6E3B099152 /* Build configuration list for PBXProject "Genius" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				021EAB743568CD899622906D /* Debug */,
+				2475E3224C5C751C599FED7C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		F1B168A36D79836B935D5846 /* Build configuration list for PBXNativeTarget "GeniusMac" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4C8920BD28962BE3F238CBD7 /* Debug */,
+				5FF0BE59ECA68909BBAC3DBD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 311BA52C6BB14BB04F3041EE /* Project object */;
+}

@@ -1,0 +1,21 @@
+.DS_Store
+
+# SwiftPM
+.build/
+Package.resolved
+
+# Xcode
+DerivedData/
+build/
+*.xcuserstate
+*.xccheckout
+*.moved-aside
+*.xcscmblueprint
+
+# Per-user project data
+*.xcodeproj/project.xcworkspace/xcuserdata/
+*.xcodeproj/xcuserdata/
+*.xcworkspace/xcuserdata/
+
+# Local app bundles
+*.app
