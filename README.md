@@ -4,22 +4,17 @@ macOS 原生重构版 Genius，使用 Swift + SwiftUI 编写。
 
 ## 当前工程入口
 
-推荐直接用 Xcode 工程维护：
+统一只使用 Xcode 工程维护和产出 app：
 
 - [Genius.xcodeproj](/Users/eugene/Downloads/GeniusMac/SwiftGenius/Genius.xcodeproj)
 - `Target`: `GeniusMac`
 - `Scheme`: `GeniusMac`
-
-同时保留了 `Swift Package` 入口，方便命令行快速编译：
-
-- [Package.swift](/Users/eugene/Downloads/GeniusMac/SwiftGenius/Package.swift)
 
 ## 目录结构
 
 ```
 SwiftGenius/
 ├── Genius.xcodeproj/           # 标准 Xcode 工程
-├── Package.swift               # SwiftPM 入口（保留）
 ├── project.yml                 # XcodeGen 配置源
 ├── GeniusMac/
 │   ├── GeniusMacApp.swift      # App 入口
@@ -71,17 +66,12 @@ SwiftGenius/
 ./scripts/build_xcode_app.sh
 ```
 
-### 方式 3：SwiftPM 快速编译
-
-```bash
-swift build
-```
-
 说明：
 
-- 日常维护推荐优先使用 Xcode 工程
+- 日常维护和打包统一只走 Xcode 工程
 - `project.yml` 是 XcodeGen 的配置源；如果需要重建 `.xcodeproj`，执行 `xcodegen generate`
-- 当前不再推荐手工创建或维护独立的 `.app` 目录
+- app 产物以 `build/xcode-derived-data/Build/Products/Debug/GeniusMac.app` 为准
+- 当前不再保留 SwiftPM 作为构建入口，也不再维护根目录下的独立 `.app` 包
 
 ## 按键映射参考（macOS KeyCode）
 
