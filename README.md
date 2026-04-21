@@ -66,12 +66,20 @@ SwiftGenius/
 ./scripts/build_xcode_app.sh
 ```
 
+### 方式 3：统一整理 Debug / Release 产物
+
+```bash
+./scripts/build_artifacts.sh
+```
+
 说明：
 
 - 日常维护和打包统一只走 Xcode 工程
 - `project.yml` 是 XcodeGen 的配置源；如果需要重建 `.xcodeproj`，执行 `xcodegen generate`
 - app 产物以 `build/xcode-derived-data/Build/Products/Debug/GeniusMac.app` 为准
 - 当前不再保留 SwiftPM 作为构建入口，也不再维护根目录下的独立 `.app` 包
+- `build_artifacts.sh` 会把产物统一整理到 `build/artifacts/Debug` 和 `build/artifacts/Release`
+- 每个配置目录下都会包含 `.app`、`.app.dSYM`（如果生成）和对应的 `.zip`、`SHA256SUMS.txt`
 
 ## 按键映射参考（macOS KeyCode）
 
