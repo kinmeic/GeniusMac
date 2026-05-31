@@ -1,21 +1,44 @@
 import Foundation
 import AppKit
 import CoreGraphics
+import Darwin
 
 protocol PixelMonitorDelegate: AnyObject {
     func pixelMonitor(_ monitor: PixelMonitor, didUpdate event: CaptureEvent)
+    func pixelMonitor(_ monitor: PixelMonitor, didTriggerKey keyCode: CGKeyCode, event: CaptureEvent)
 }
 
 final class PixelMonitor {
     weak var delegate: PixelMonitorDelegate?
 
-    private var timer: Timer?
+    private let queue = DispatchQueue(label: "com.genius.mac.pixel-monitor", qos: .userInteractive)
+    private var timer: DispatchSourceTimer?
     private var isRunning = false
+    private var cachedWindowInfo: WindowInfo?
+    private var cachedDisplayColorSpace: CGColorSpace?
+    private var lastWindowRefreshTime: CFTimeInterval = 0
+    private var lastProcessCheckTime: CFTimeInterval = 0
+    private var lastPermissionCheckTime: CFTimeInterval = 0
+    private var lastUIReportTime: CFTimeInterval = 0
+    private var lastReportedRGB: Int?
+    private var screenCaptureAllowed = true
+    private var pixelData = [UInt8](repeating: 0, count: 16)
+    private let targetColorSpace = CGColorSpace(name: CGColorSpace.sRGB) ?? CGColorSpaceCreateDeviceRGB()
 
     var targetPID: pid_t?
     var x: Int = 1
     var y: Int = 1
     var interval: TimeInterval = 0.1
+    var filterG: Int = 0
+    var filterB: Int = 0
+    var keyMappings: [Int: CGKeyCode] = [:]
+
+    private var isTargetForeground = false
+
+    private let windowRefreshInterval: CFTimeInterval = 0.5
+    private let processCheckInterval: CFTimeInterval = 1.0
+    private let permissionCheckInterval: CFTimeInterval = 1.0
+    private let uiReportInterval: CFTimeInterval = 0.1
 
     var isEnabled: Bool { isRunning }
 
@@ -29,26 +52,54 @@ final class PixelMonitor {
     func start() {
         guard !isRunning else { return }
         isRunning = true
-        rescheduleTimer()
+        queue.async { [weak self] in
+            self?.cachedWindowInfo = nil
+            self?.cachedDisplayColorSpace = nil
+            self?.lastWindowRefreshTime = 0
+            self?.lastProcessCheckTime = 0
+            self?.lastPermissionCheckTime = 0
+            self?.lastUIReportTime = 0
+            self?.lastReportedRGB = nil
+            self?.screenCaptureAllowed = self?.hasScreenRecordingPermission() ?? false
+            self?.rescheduleTimer()
+        }
     }
 
     func stop() {
         isRunning = false
-        timer?.invalidate()
-        timer = nil
+        queue.async { [weak self] in
+            self?.timer?.cancel()
+            self?.timer = nil
+            self?.cachedWindowInfo = nil
+            self?.cachedDisplayColorSpace = nil
+        }
     }
 
     func updateInterval(_ newInterval: TimeInterval) {
         interval = newInterval
         guard isRunning else { return }
-        rescheduleTimer()
+        queue.async { [weak self] in
+            self?.rescheduleTimer()
+        }
+    }
+
+    func updateForegroundState(_ isForeground: Bool) {
+        queue.async { [weak self] in
+            self?.isTargetForeground = isForeground
+        }
     }
 
     private func rescheduleTimer() {
-        timer?.invalidate()
-        timer = Timer.scheduledTimer(withTimeInterval: interval, repeats: true) { [weak self] _ in
+        timer?.cancel()
+
+        let source = DispatchSource.makeTimerSource(queue: queue)
+        let repeating = DispatchTimeInterval.nanoseconds(max(Int(interval * 1_000_000_000), 1_000_000))
+        source.schedule(deadline: .now(), repeating: repeating, leeway: .milliseconds(1))
+        source.setEventHandler { [weak self] in
             self?.tick()
         }
+        timer = source
+        source.resume()
     }
 
     private func tick() {
@@ -57,30 +108,62 @@ final class PixelMonitor {
             return
         }
 
-        guard let app = NSWorkspace.shared.runningApplications.first(where: { $0.processIdentifier == pid }) else {
-            delegate?.pixelMonitor(self, didUpdate: CaptureEvent(error: .processExited))
-            return
+        let now = CFAbsoluteTimeGetCurrent()
+
+        if now - lastProcessCheckTime >= processCheckInterval {
+            lastProcessCheckTime = now
+            guard isProcessAlive(pid) else {
+                delegate?.pixelMonitor(self, didUpdate: CaptureEvent(error: .processExited))
+                return
+            }
         }
 
-        guard !app.isTerminated else {
-            delegate?.pixelMonitor(self, didUpdate: CaptureEvent(error: .processExited))
-            return
+        if now - lastPermissionCheckTime >= permissionCheckInterval {
+            lastPermissionCheckTime = now
+            screenCaptureAllowed = hasScreenRecordingPermission()
         }
 
-        guard hasScreenRecordingPermission() else {
+        guard screenCaptureAllowed else {
             delegate?.pixelMonitor(self, didUpdate: CaptureEvent(error: .permissionDenied))
             return
         }
 
-        if let windowInfo = findWindowInfo(forPID: pid) {
-            capturePixelViaScreen(at: windowInfo)
+        guard let windowInfo = currentWindowInfo(forPID: pid, now: now) else {
+            report(CaptureEvent(error: .noWindowHandle), now: now, force: false)
             return
         }
 
-        delegate?.pixelMonitor(self, didUpdate: CaptureEvent(error: .noWindowHandle))
+        capturePixelViaScreen(at: windowInfo, now: now)
     }
 
-    private func capturePixelViaScreen(at windowInfo: WindowInfo) {
+    private func isProcessAlive(_ pid: pid_t) -> Bool {
+        kill(pid, 0) == 0 || errno == EPERM
+    }
+
+    private func currentWindowInfo(forPID pid: pid_t, now: CFTimeInterval) -> WindowInfo? {
+        if let cachedWindowInfo, now - lastWindowRefreshTime < windowRefreshInterval {
+            return cachedWindowInfo
+        }
+
+        guard let refreshed = findWindowInfo(forPID: pid) else {
+            cachedWindowInfo = nil
+            cachedDisplayColorSpace = nil
+            lastWindowRefreshTime = now
+            return nil
+        }
+
+        cachedWindowInfo = refreshed
+        cachedDisplayColorSpace = colorSpaceForDisplay(
+            containing: CGPoint(
+                x: refreshed.bounds.origin.x + CGFloat(x),
+                y: refreshed.bounds.origin.y + CGFloat(y)
+            )
+        )
+        lastWindowRefreshTime = now
+        return refreshed
+    }
+
+    private func capturePixelViaScreen(at windowInfo: WindowInfo, now: CFTimeInterval) {
         let screenX = windowInfo.bounds.origin.x + CGFloat(x)
         let screenY = windowInfo.bounds.origin.y + CGFloat(y)
         let captureBounds = CGRect(x: screenX, y: screenY, width: 1, height: 1)
@@ -91,44 +174,52 @@ final class PixelMonitor {
             kCGNullWindowID,
             [.bestResolution]
         ) else {
-            delegate?.pixelMonitor(self, didUpdate: CaptureEvent(error: .noWindowHandle))
+            cachedWindowInfo = nil
+            cachedDisplayColorSpace = nil
+            report(CaptureEvent(error: .noWindowHandle), now: now, force: false)
             return
         }
 
-        let capturePoint = CGPoint(x: screenX, y: screenY)
-        let displayColorSpace = colorSpaceForDisplay(containing: capturePoint)
-        extractAndReportColor(from: image, displayColorSpace: displayColorSpace)
+        if let event = extractColor(from: image, displayColorSpace: cachedDisplayColorSpace) {
+            triggerKeyIfNeeded(for: event)
+            report(event, now: now, force: false)
+        } else {
+            report(CaptureEvent(error: .noWindowHandle), now: now, force: false)
+        }
     }
 
-    private func extractAndReportColor(from image: CGImage, displayColorSpace: CGColorSpace?) {
+    private func extractColor(from image: CGImage, displayColorSpace: CGColorSpace?) -> CaptureEvent? {
         let width = image.width
         let height = image.height
-        guard width > 0, height > 0 else {
-            delegate?.pixelMonitor(self, didUpdate: CaptureEvent(error: .noWindowHandle))
-            return
-        }
+        guard width > 0, height > 0 else { return nil }
 
         let sourceColorSpace = displayColorSpace ?? image.colorSpace ?? CGColorSpaceCreateDeviceRGB()
-        let targetColorSpace = CGColorSpace(name: CGColorSpace.sRGB) ?? CGColorSpaceCreateDeviceRGB()
         let bytesPerPixel = 4
         let bytesPerRow = bytesPerPixel * width
         let bitsPerComponent = 8
-        var pixelData = [UInt8](repeating: 0, count: width * height * bytesPerPixel)
-
-        guard let context = CGContext(
-            data: &pixelData,
-            width: width,
-            height: height,
-            bitsPerComponent: bitsPerComponent,
-            bytesPerRow: bytesPerRow,
-            space: sourceColorSpace,
-            bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue
-        ) else {
-            delegate?.pixelMonitor(self, didUpdate: CaptureEvent(error: .noWindowHandle))
-            return
+        let requiredByteCount = width * height * bytesPerPixel
+        if pixelData.count < requiredByteCount {
+            pixelData = [UInt8](repeating: 0, count: requiredByteCount)
         }
 
-        context.draw(image, in: CGRect(x: 0, y: 0, width: width, height: height))
+        let drewImage = pixelData.withUnsafeMutableBytes { buffer in
+            guard let context = CGContext(
+                data: buffer.baseAddress,
+                width: width,
+                height: height,
+                bitsPerComponent: bitsPerComponent,
+                bytesPerRow: bytesPerRow,
+                space: sourceColorSpace,
+                bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue
+            ) else {
+                return false
+            }
+
+            context.draw(image, in: CGRect(x: 0, y: 0, width: width, height: height))
+            return true
+        }
+
+        guard drewImage else { return nil }
 
         let r = CGFloat(pixelData[0]) / 255.0
         let g = CGFloat(pixelData[1]) / 255.0
@@ -153,6 +244,33 @@ final class PixelMonitor {
         event.g = green
         event.b = blue
         event.rgb = (red) | (green << 8) | (blue << 16)
+        return event
+    }
+
+    private func triggerKeyIfNeeded(for event: CaptureEvent) {
+        guard isTargetForeground,
+              event.g == filterG,
+              event.b == filterB,
+              let keyCode = keyMappings[event.r] else {
+            return
+        }
+
+        KeySimulator.press(keyCode: keyCode)
+        delegate?.pixelMonitor(self, didTriggerKey: keyCode, event: event)
+    }
+
+    private func report(_ event: CaptureEvent, now: CFTimeInterval, force: Bool) {
+        if force {
+            delegate?.pixelMonitor(self, didUpdate: event)
+            return
+        }
+
+        guard now - lastUIReportTime >= uiReportInterval || event.rgb != lastReportedRGB else {
+            return
+        }
+
+        lastUIReportTime = now
+        lastReportedRGB = event.rgb
         delegate?.pixelMonitor(self, didUpdate: event)
     }
 

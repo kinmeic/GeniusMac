@@ -19,5 +19,11 @@ struct GeniusMacApp: App {
         }
         .defaultSize(width: 640, height: 560)
         .windowResizability(.contentSize)
+
+        Window("日志", id: "logs") {
+            LogView()
+                .environmentObject(viewModel)
+        }
+        .defaultSize(width: 720, height: 480)
     }
 }

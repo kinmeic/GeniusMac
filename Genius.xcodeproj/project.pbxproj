@@ -7,15 +7,19 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0838EB1A9245C2E0C8662737 /* LogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C7CABEA37173C9E717A324B /* LogView.swift */; };
+		2485B5024E73F2F06A770F79 /* Config.json in Resources */ = {isa = PBXBuildFile; fileRef = 702C5967E7B41F37B08E5615 /* Config.json */; };
 		3CCFFABD3C207301B0A6A102 /* PixelMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FDFBEE13B365CCC0E188E86 /* PixelMonitor.swift */; };
 		3CE37DADFDBB33EFB237B8A6 /* GeniusMacApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC910F5C322CE21B0004836C /* GeniusMacApp.swift */; };
 		48253B02564375857BB345FA /* ProcessManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4588A656F87D1F98B7DF3BB3 /* ProcessManager.swift */; };
 		5E0494C60C5BC83AF77149CA /* ConfigService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24CB15C6CAC5FF085C11F4B6 /* ConfigService.swift */; };
+		783A95A55EAFAAF188AFD8C0 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B1D093EA13D2DAED547EF445 /* Assets.xcassets */; };
 		8A4FDB3122AF8175052B6E91 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77B885E8BA88E7D5AB02AA35 /* SettingsView.swift */; };
 		908489F2AE87C4B05F5E44A4 /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60D01687F2431B7B8A98AB58 /* MainView.swift */; };
 		C289FCDEA4B311D90C54383A /* KeySimulator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83C335971C1216F0B98F77B0 /* KeySimulator.swift */; };
 		C7E6CB0F4C32DB19EA424EE7 /* Config.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E48C377E14FA6A37BE2DEF5 /* Config.swift */; };
 		C8D88F2D99259171869333D3 /* CaptureEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDB55C163D8482D11344725A /* CaptureEvent.swift */; };
+		D891BA88E6AFBBE598F17892 /* LogEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6559288555729FA47472CECF /* LogEntry.swift */; };
 		DD92BC50BB52607AEF75C455 /* WindowObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E8C0673BCDD1A9F493BECEE /* WindowObserver.swift */; };
 		F280CD8B8F51B53C298345C9 /* KeyMapping.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CB480A5A75DE044AC325B26 /* KeyMapping.swift */; };
 		F597CEF39A0D16CACF5266EE /* KeyCode+Common.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADF0ADDB6A95430F938E1B0F /* KeyCode+Common.swift */; };
@@ -23,6 +27,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		1C7CABEA37173C9E717A324B /* LogView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogView.swift; sourceTree = "<group>"; };
 		1E48C377E14FA6A37BE2DEF5 /* Config.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Config.swift; sourceTree = "<group>"; };
 		24CB15C6CAC5FF085C11F4B6 /* ConfigService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigService.swift; sourceTree = "<group>"; };
 		2CB480A5A75DE044AC325B26 /* KeyMapping.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyMapping.swift; sourceTree = "<group>"; };
@@ -30,9 +35,12 @@
 		4588A656F87D1F98B7DF3BB3 /* ProcessManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProcessManager.swift; sourceTree = "<group>"; };
 		4FDFBEE13B365CCC0E188E86 /* PixelMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PixelMonitor.swift; sourceTree = "<group>"; };
 		60D01687F2431B7B8A98AB58 /* MainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView.swift; sourceTree = "<group>"; };
+		6559288555729FA47472CECF /* LogEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogEntry.swift; sourceTree = "<group>"; };
+		702C5967E7B41F37B08E5615 /* Config.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = Config.json; sourceTree = "<group>"; };
 		77B885E8BA88E7D5AB02AA35 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		83C335971C1216F0B98F77B0 /* KeySimulator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeySimulator.swift; sourceTree = "<group>"; };
 		ADF0ADDB6A95430F938E1B0F /* KeyCode+Common.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "KeyCode+Common.swift"; sourceTree = "<group>"; };
+		B1D093EA13D2DAED547EF445 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		BD876F6D899B48413581C31E /* GeniusMac.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GeniusMac.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C3656360B9D0A7056431EA8C /* PermissionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PermissionService.swift; sourceTree = "<group>"; };
 		CDB55C163D8482D11344725A /* CaptureEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CaptureEvent.swift; sourceTree = "<group>"; };
@@ -43,9 +51,11 @@
 		2D0135FAB838EE0EC09EF36C /* GeniusMac */ = {
 			isa = PBXGroup;
 			children = (
+				B1D093EA13D2DAED547EF445 /* Assets.xcassets */,
 				DC910F5C322CE21B0004836C /* GeniusMacApp.swift */,
 				DB2CB117A3682756AD3BF31D /* Core */,
 				C5B48DCCD201B6605268EEB1 /* Models */,
+				8693DB947DEE09D4E794627D /* Resources */,
 				F1682AB3BAD1480D79FE1758 /* Services */,
 				6D8BFD354399E16BA82195E1 /* Views */,
 			);
@@ -63,10 +73,19 @@
 		6D8BFD354399E16BA82195E1 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				1C7CABEA37173C9E717A324B /* LogView.swift */,
 				60D01687F2431B7B8A98AB58 /* MainView.swift */,
 				77B885E8BA88E7D5AB02AA35 /* SettingsView.swift */,
 			);
 			path = Views;
+			sourceTree = "<group>";
+		};
+		8693DB947DEE09D4E794627D /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				702C5967E7B41F37B08E5615 /* Config.json */,
+			);
+			path = Resources;
 			sourceTree = "<group>";
 		};
 		C5B48DCCD201B6605268EEB1 /* Models */ = {
@@ -75,6 +94,7 @@
 				CDB55C163D8482D11344725A /* CaptureEvent.swift */,
 				1E48C377E14FA6A37BE2DEF5 /* Config.swift */,
 				2CB480A5A75DE044AC325B26 /* KeyMapping.swift */,
+				6559288555729FA47472CECF /* LogEntry.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -116,6 +136,7 @@
 			buildConfigurationList = F1B168A36D79836B935D5846 /* Build configuration list for PBXNativeTarget "GeniusMac" */;
 			buildPhases = (
 				0B7305A66B1D4EE740B12A73 /* Sources */,
+				7F777F264645F5F3A2C62421 /* Resources */,
 			);
 			buildRules = (
 			);
@@ -158,6 +179,18 @@
 		};
 /* End PBXProject section */
 
+/* Begin PBXResourcesBuildPhase section */
+		7F777F264645F5F3A2C62421 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				783A95A55EAFAAF188AFD8C0 /* Assets.xcassets in Resources */,
+				2485B5024E73F2F06A770F79 /* Config.json in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		0B7305A66B1D4EE740B12A73 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
@@ -170,6 +203,8 @@
 				F597CEF39A0D16CACF5266EE /* KeyCode+Common.swift in Sources */,
 				F280CD8B8F51B53C298345C9 /* KeyMapping.swift in Sources */,
 				C289FCDEA4B311D90C54383A /* KeySimulator.swift in Sources */,
+				D891BA88E6AFBBE598F17892 /* LogEntry.swift in Sources */,
+				0838EB1A9245C2E0C8662737 /* LogView.swift in Sources */,
 				908489F2AE87C4B05F5E44A4 /* MainView.swift in Sources */,
 				FDF6CAE8DF5C6BAB21D9F586 /* PermissionService.swift in Sources */,
 				3CCFFABD3C207301B0A6A102 /* PixelMonitor.swift in Sources */,

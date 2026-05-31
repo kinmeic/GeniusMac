@@ -21,9 +21,10 @@ targets:
           - Resources/Config.json
           - Assets.xcassets
           - .DS_Store
-    resources:
       - path: GeniusMac/Resources/Config.json
+        buildPhase: resources
       - path: GeniusMac/Assets.xcassets
+        buildPhase: resources
     settings:
       base:
         PRODUCT_NAME: GeniusMac

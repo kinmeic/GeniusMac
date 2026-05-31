@@ -48,22 +48,23 @@ struct MainView: View {
             }
             .labelsHidden()
             .pickerStyle(.menu)
+            .controlSize(.large)
             .frame(minWidth: 208, maxWidth: .infinity, alignment: .leading)
+            .disabled(viewModel.isMonitoring)
+
+            Button {
+                viewModel.refreshProcesses()
+            } label: {
+                Label("刷新", systemImage: "arrow.clockwise")
+            }
+            .buttonStyle(.bordered)
+            .controlSize(.large)
             .disabled(viewModel.isMonitoring)
         }
     }
 
     private var actionRow: some View {
         HStack(spacing: 10) {
-            Button {
-                viewModel.refreshProcesses()
-            } label: {
-                Label("刷新", systemImage: "arrow.clockwise")
-            }
-            .buttonStyle(.borderedProminent)
-            .controlSize(.large)
-            .disabled(viewModel.isMonitoring)
-
             Button {
                 viewModel.startMonitoring()
             } label: {
@@ -81,6 +82,14 @@ struct MainView: View {
             .buttonStyle(.bordered)
             .controlSize(.large)
             .disabled(!viewModel.isMonitoring)
+
+            Button {
+                openWindow(id: "logs")
+            } label: {
+                Label("日志", systemImage: "doc.text")
+            }
+            .buttonStyle(.bordered)
+            .controlSize(.large)
 
             Button {
                 openWindow(id: "settings")
@@ -151,6 +160,7 @@ final class MainViewModel: ObservableObject {
     @Published var showPermissionAlert = false
     @Published var screenRecordingGranted = false
     @Published var accessibilityGranted = false
+    @Published var logs: [LogEntry] = []
 
     private let processManager = ProcessManager()
     private let pixelMonitor = PixelMonitor()
@@ -159,6 +169,10 @@ final class MainViewModel: ObservableObject {
     private let permissionService = PermissionService()
 
     private var cancellables = Set<AnyCancellable>()
+    private var lastLoggedCaptureError: CaptureEvent.Error?
+    private var didLogCaptureRecovery = false
+    private var didInitialize = false
+    private let maxLogCount = 500
 
     var permissionsHealthy: Bool {
         screenRecordingGranted && accessibilityGranted
@@ -183,24 +197,41 @@ final class MainViewModel: ObservableObject {
     }
 
     func onAppear() {
+        guard !didInitialize else { return }
+        didInitialize = true
+
         config = configService.load()
-        refreshRuntimeState()
         pixelMonitor.delegate = self
+        appendLog("应用已启动")
+        refreshRuntimeState()
 
         windowObserver.$isTargetForeground
             .receive(on: DispatchQueue.main)
             .sink { [weak self] value in
-                self?.isTargetForeground = value
-                self?.updateSamplingInterval()
+                guard let self else { return }
+                let changed = self.isTargetForeground != value
+                self.isTargetForeground = value
+                self.pixelMonitor.updateForegroundState(value)
+                if changed {
+                    self.appendLog(value ? "目标窗口进入前台" : "目标窗口离开前台")
+                    self.updateSamplingInterval()
+                }
             }
             .store(in: &cancellables)
     }
 
     func refreshProcesses() {
+        refreshProcesses(shouldLog: true)
+    }
+
+    private func refreshProcesses(shouldLog: Bool) {
         processes = processManager.listVisibleProcesses()
         if let selectedProcessID,
            !processes.contains(where: { $0.id == selectedProcessID }) {
             self.selectedProcessID = nil
+        }
+        if shouldLog {
+            appendLog("已刷新进程列表，共 \(processes.count) 个可见进程")
         }
     }
 
@@ -212,7 +243,7 @@ final class MainViewModel: ObservableObject {
     func refreshRuntimeState() {
         screenRecordingGranted = permissionService.screenRecordingGranted()
         accessibilityGranted = permissionService.accessibilityGranted()
-        refreshProcesses()
+        refreshProcesses(shouldLog: false)
     }
 
     func startMonitoring() {
@@ -223,12 +254,14 @@ final class MainViewModel: ObservableObject {
 
         guard processManager.findProcess(byPID: pid) != nil else {
             statusText = "进程不存在或已退出"
+            appendLog("启动监视失败：进程不存在或已退出，PID \(pid)", level: .error)
             return
         }
 
         guard screenRecordingGranted else {
             statusText = "缺少屏幕录制权限"
             showPermissionAlert = true
+            appendLog("启动监视失败：缺少屏幕录制权限", level: .error)
             return
         }
 
@@ -236,6 +269,15 @@ final class MainViewModel: ObservableObject {
         pixelMonitor.x = config.captureX
         pixelMonitor.y = config.captureY
         pixelMonitor.interval = normalizedInterval(isForeground: false)
+        pixelMonitor.filterG = config.filterG
+        pixelMonitor.filterB = config.filterB
+        pixelMonitor.keyMappings = Dictionary(
+            uniqueKeysWithValues: config.keyMappings.compactMap { key, value in
+                guard let color = Int(key) else { return nil }
+                return (color, CGKeyCode(truncatingIfNeeded: value))
+            }
+        )
+        pixelMonitor.updateForegroundState(false)
 
         showPermissionAlert = false
         windowObserver.targetProcessID = pid
@@ -244,6 +286,9 @@ final class MainViewModel: ObservableObject {
         pixelMonitor.start()
         isMonitoring = true
         statusText = "监视中..."
+        lastLoggedCaptureError = nil
+        didLogCaptureRecovery = false
+        appendLog("开始监视 PID \(pid)，采样点 (\(config.captureX), \(config.captureY))")
     }
 
     func stopMonitoring() {
@@ -252,6 +297,11 @@ final class MainViewModel: ObservableObject {
         isMonitoring = false
         isTargetForeground = false
         statusText = "等待中..."
+        appendLog("停止监视")
+    }
+
+    func clearLogs() {
+        logs.removeAll()
     }
 
     func openScreenRecordingSettings() {
@@ -269,7 +319,14 @@ final class MainViewModel: ObservableObject {
 
     private func normalizedInterval(isForeground: Bool) -> TimeInterval {
         let intervalMS = isForeground ? config.interval : config.backgroundInterval
-        return max(Double(intervalMS) / 1000.0, 0.05)
+        return max(Double(intervalMS) / 1000.0, 0.005)
+    }
+
+    private func appendLog(_ message: String, level: LogEntry.Level = .info) {
+        logs.append(LogEntry(timestamp: Date(), level: level, message: message))
+        if logs.count > maxLogCount {
+            logs.removeFirst(logs.count - maxLogCount)
+        }
     }
 }
 
@@ -283,28 +340,108 @@ extension MainViewModel: PixelMonitorDelegate {
                 showPermissionAlert = false
                 screenRecordingGranted = true
                 statusText = String(format: "R:%d G:%d B:%d", event.r, event.g, event.b)
-
-                guard isTargetForeground else { return }
-
-                if event.g == config.filterG && event.b == config.filterB {
-                    if let keyCodeValue = config.getKeyMapping(for: event.r) {
-                        KeySimulator.press(keyCode: CGKeyCode(truncatingIfNeeded: keyCodeValue))
-                    }
+                if !didLogCaptureRecovery || lastLoggedCaptureError != nil {
+                    appendLog("采样正常，当前色值 R:\(event.r) G:\(event.g) B:\(event.b)")
+                    didLogCaptureRecovery = true
+                    lastLoggedCaptureError = nil
                 }
 
             case .noWindowHandle:
                 statusText = "未找到可采样的目标窗口"
+                logCaptureErrorIfNeeded(.noWindowHandle, message: "未找到可采样的目标窗口", level: .warning)
             case .processExited:
                 statusText = "进程不存在或已退出"
+                logCaptureErrorIfNeeded(.processExited, message: "目标进程不存在或已退出", level: .error)
                 stopMonitoring()
             case .notResponding:
                 statusText = "进程无响应..."
+                logCaptureErrorIfNeeded(.notResponding, message: "目标进程无响应", level: .warning)
             case .permissionDenied:
                 statusText = "缺少屏幕录制权限"
                 screenRecordingGranted = false
                 showPermissionAlert = true
+                logCaptureErrorIfNeeded(.permissionDenied, message: "缺少屏幕录制权限", level: .error)
                 stopMonitoring()
             }
+        }
+    }
+
+    nonisolated func pixelMonitor(_ monitor: PixelMonitor, didTriggerKey keyCode: CGKeyCode, event: CaptureEvent) {
+        Task { @MainActor in
+            appendLog(
+                "发送按键 \(keyName(for: keyCode)) (keyCode \(keyCode))，RGB R:\(event.r) G:\(event.g) B:\(event.b)，rgb \(event.rgb)"
+            )
+        }
+    }
+
+    private func logCaptureErrorIfNeeded(
+        _ error: CaptureEvent.Error,
+        message: String,
+        level: LogEntry.Level
+    ) {
+        guard lastLoggedCaptureError != error else { return }
+        lastLoggedCaptureError = error
+        appendLog(message, level: level)
+    }
+
+    private func keyName(for keyCode: CGKeyCode) -> String {
+        switch keyCode {
+        case 0:
+            return "A"
+        case 11:
+            return "B"
+        case 18:
+            return "1"
+        case 19:
+            return "2"
+        case 20:
+            return "3"
+        case 21:
+            return "4"
+        case 22:
+            return "6"
+        case 23:
+            return "5"
+        case 24:
+            return "="
+        case 25:
+            return "9"
+        case 26:
+            return "7"
+        case 28:
+            return "8"
+        case 29:
+            return "0"
+        case 49:
+            return "Space"
+        case 50:
+            return "`"
+        case 96:
+            return "F5"
+        case 97:
+            return "F6"
+        case 98:
+            return "F7"
+        case 99:
+            return "F3"
+        case 100:
+            return "F8"
+        case 101:
+            return "F9"
+        case 103:
+            return "F11"
+        case 109:
+            return "F10"
+        case 111:
+            return "F12"
+        case 118:
+            return "F4"
+        case 120:
+            return "F2"
+        case 122:
+            return "F1"
+        default:
+            return "Unknown"
         }
     }
 }
