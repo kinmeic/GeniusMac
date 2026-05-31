@@ -40,7 +40,7 @@ jobs:
           BINARY_PATH="$APP_PATH/Contents/MacOS/GeniusMac"
 
           test -d "$APP_PATH"
-          lipo -verify_arch arm64 x86_64 "$BINARY_PATH"
+          lipo "$BINARY_PATH" -verify_arch arm64 x86_64
           lipo -info "$BINARY_PATH"
 
           mkdir -p dist
