@@ -6,18 +6,24 @@ struct MainView: View {
     @EnvironmentObject private var viewModel: MainViewModel
     @Environment(\.openWindow) private var openWindow
 
+    private static let logTimeFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "HH:mm:ss"
+        return formatter
+    }()
+
     var body: some View {
-        VStack(alignment: .leading, spacing: 14) {
-            header
-            controlRow
-            actionRow
-            bottomStatusBar
+        HStack(spacing: 0) {
+            processPane
+                .frame(width: 300)
+
+            Divider()
+
+            dashboardPane
+                .frame(minWidth: 500, maxWidth: .infinity, maxHeight: .infinity)
         }
-        .padding(.top, 10)
-        .padding(.horizontal, 14)
-        .padding(.bottom, 14)
-        .frame(minWidth: 432, minHeight: 176)
         .background(Color(nsColor: .windowBackgroundColor))
+        .frame(minWidth: 820, minHeight: 520)
         .onAppear {
             viewModel.onAppear()
         }
@@ -34,41 +40,177 @@ struct MainView: View {
         }
     }
 
-    private var header: some View {
-        EmptyView()
-    }
+    private var processPane: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            HStack {
+                Label("进程", systemImage: "macwindow")
+                    .font(.headline)
 
-    private var controlRow: some View {
-        HStack(spacing: 10) {
-            Picker("目标进程", selection: $viewModel.selectedProcessID) {
-                Text("请选择目标进程").tag(nil as Int?)
+                Spacer()
+
+                Button {
+                    viewModel.refreshProcesses()
+                } label: {
+                    Image(systemName: "arrow.clockwise")
+                }
+                .buttonStyle(.borderless)
+                .controlSize(.large)
+                .help("刷新进程列表")
+                .disabled(viewModel.isMonitoring)
+            }
+
+            selectionSummary
+
+            List(selection: $viewModel.selectedProcessID) {
                 ForEach(viewModel.processes) { process in
-                    Text(process.displayName).tag(Optional(process.id))
+                    processRow(process)
+                        .tag(Optional(process.id))
                 }
             }
-            .labelsHidden()
-            .pickerStyle(.menu)
-            .controlSize(.large)
-            .frame(minWidth: 208, maxWidth: .infinity, alignment: .leading)
+            .listStyle(.sidebar)
             .disabled(viewModel.isMonitoring)
-
-            Button {
-                viewModel.refreshProcesses()
-            } label: {
-                Label("刷新", systemImage: "arrow.clockwise")
+            .overlay {
+                if viewModel.processes.isEmpty {
+                    Text("暂无可见进程")
+                        .foregroundStyle(.secondary)
+                }
             }
-            .buttonStyle(.bordered)
-            .controlSize(.large)
-            .disabled(viewModel.isMonitoring)
+        }
+        .padding(16)
+        .background(Color(nsColor: .controlBackgroundColor).opacity(0.55))
+    }
+
+    private var selectionSummary: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text(viewModel.isMonitoring ? "已锁定目标" : "当前选择")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+
+            if let selectedProcess {
+                Text(selectedProcess.name)
+                    .font(.system(.body, design: .rounded, weight: .semibold))
+                    .lineLimit(1)
+                Text("PID \(selectedProcess.pid)")
+                    .font(.system(.caption, design: .rounded))
+                    .foregroundStyle(.secondary)
+            } else {
+                Text("未选择进程")
+                    .font(.system(.body, design: .rounded, weight: .semibold))
+                    .foregroundStyle(.secondary)
+            }
+        }
+        .padding(12)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(
+            RoundedRectangle(cornerRadius: 8, style: .continuous)
+                .fill(Color(nsColor: .windowBackgroundColor))
+        )
+    }
+
+    private func processRow(_ process: RunningProcess) -> some View {
+        HStack(spacing: 10) {
+            Image(systemName: selectedProcess?.id == process.id ? "checkmark.circle.fill" : "circle")
+                .foregroundStyle(selectedProcess?.id == process.id ? .blue : .secondary)
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(process.name)
+                    .lineLimit(1)
+                Text("PID \(process.pid)")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+
+            Spacer()
+        }
+        .padding(.vertical, 4)
+    }
+
+    private var dashboardPane: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            HStack(alignment: .center) {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Genius")
+                        .font(.title2.weight(.semibold))
+                    Text(viewModel.isMonitoring ? "正在捕获" : "待命")
+                        .foregroundStyle(.secondary)
+                }
+
+                Spacer()
+
+                statusBadge
+            }
+
+            statusGrid
+
+            actionPanel
+
+            recentLogsPanel
+        }
+        .padding(20)
+    }
+
+    private var statusBadge: some View {
+        HStack(spacing: 6) {
+            Circle()
+                .fill(viewModel.isMonitoring ? Color.green : Color.secondary)
+                .frame(width: 8, height: 8)
+            Text(viewModel.isMonitoring ? "运行中" : "空闲")
+                .font(.system(.caption, design: .rounded, weight: .semibold))
+        }
+        .padding(.horizontal, 10)
+        .padding(.vertical, 6)
+        .background(
+            Capsule()
+                .fill(Color(nsColor: .controlBackgroundColor))
+        )
+    }
+
+    private var statusGrid: some View {
+        LazyVGrid(columns: [
+            GridItem(.flexible(), spacing: 10),
+            GridItem(.flexible(), spacing: 10)
+        ], spacing: 10) {
+            statusCard(title: "状态", value: viewModel.statusText, systemImage: "waveform.path.ecg", tint: statusColor)
+            statusCard(title: "权限", value: viewModel.permissionSummary, systemImage: "lock.shield", tint: viewModel.permissionsHealthy ? .green : .orange)
+            statusCard(title: "窗口", value: viewModel.isTargetForeground ? "前台" : "后台", systemImage: "rectangle.on.rectangle", tint: viewModel.isTargetForeground ? .green : .orange)
+            statusCard(title: "监视频率", value: viewModel.monitorFrequencyText, systemImage: "timer", tint: .secondary)
         }
     }
 
-    private var actionRow: some View {
+    private func statusCard(title: String, value: String, systemImage: String, tint: Color) -> some View {
+        HStack(spacing: 10) {
+            Image(systemName: systemImage)
+                .font(.system(size: 18, weight: .medium))
+                .foregroundStyle(tint)
+                .frame(width: 24)
+
+            VStack(alignment: .leading, spacing: 3) {
+                Text(title)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                Text(value)
+                    .font(.system(.body, design: .rounded, weight: .semibold))
+                    .foregroundStyle(tint)
+                    .lineLimit(1)
+            }
+
+            Spacer()
+        }
+        .padding(12)
+        .frame(maxWidth: .infinity, minHeight: 70, alignment: .leading)
+        .background(
+            RoundedRectangle(cornerRadius: 8, style: .continuous)
+                .fill(Color(nsColor: .controlBackgroundColor))
+        )
+    }
+
+    private var actionPanel: some View {
         HStack(spacing: 10) {
             Button {
                 viewModel.startMonitoring()
             } label: {
-                Label("开始监视", systemImage: "play.fill")
+                Label("开始捕获", systemImage: "play.fill")
+                    .frame(maxWidth: .infinity)
             }
             .buttonStyle(.borderedProminent)
             .controlSize(.large)
@@ -77,52 +219,122 @@ struct MainView: View {
             Button {
                 viewModel.stopMonitoring()
             } label: {
-                Label("停止监视", systemImage: "stop.fill")
+                Label("停止", systemImage: "stop.fill")
+                    .frame(maxWidth: .infinity)
             }
             .buttonStyle(.bordered)
             .controlSize(.large)
             .disabled(!viewModel.isMonitoring)
 
             Button {
-                openWindow(id: "logs")
-            } label: {
-                Label("日志", systemImage: "doc.text")
-            }
-            .buttonStyle(.bordered)
-            .controlSize(.large)
-
-            Button {
                 openWindow(id: "settings")
             } label: {
-                Label("设置", systemImage: "slider.horizontal.3")
+                Image(systemName: "slider.horizontal.3")
             }
             .buttonStyle(.bordered)
             .controlSize(.large)
+            .help("打开设置")
             .disabled(viewModel.isMonitoring)
         }
+        .padding(12)
+        .background(
+            RoundedRectangle(cornerRadius: 8, style: .continuous)
+                .fill(Color(nsColor: .controlBackgroundColor))
+        )
     }
 
-    private var bottomStatusBar: some View {
-        HStack(spacing: 8) {
-            compactStatusItem(title: "状态", value: viewModel.statusText, tint: statusColor)
-            compactStatusItem(title: "权限", value: viewModel.permissionSummary, tint: viewModel.permissionsHealthy ? .green : .orange)
-            compactStatusItem(title: "窗口", value: viewModel.isTargetForeground ? "前台" : "后台", tint: viewModel.isTargetForeground ? .green : .orange)
-            compactStatusItem(title: "监视频率", value: viewModel.monitorFrequencyText, tint: .secondary)
+    private var recentLogsPanel: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack {
+                Label("最近日志", systemImage: "list.bullet.rectangle")
+                    .font(.headline)
+
+                Spacer()
+
+                Button {
+                    viewModel.clearLogs()
+                } label: {
+                    Image(systemName: "trash")
+                }
+                .buttonStyle(.borderless)
+                .help("清空日志")
+                .disabled(viewModel.logs.isEmpty)
+            }
+
+            ScrollViewReader { proxy in
+                ScrollView {
+                    LazyVStack(alignment: .leading, spacing: 0) {
+                        if viewModel.logs.isEmpty {
+                            Text("暂无日志")
+                                .foregroundStyle(.secondary)
+                                .frame(maxWidth: .infinity, minHeight: 120, alignment: .center)
+                        } else {
+                            ForEach(viewModel.logs.suffix(80)) { entry in
+                                recentLogRow(entry)
+                                    .id(entry.id)
+                                Divider()
+                            }
+                        }
+                    }
+                }
+                .onChange(of: viewModel.logs.last?.id) { id in
+                    guard let id else { return }
+                    proxy.scrollTo(id, anchor: .bottom)
+                }
+            }
         }
-        .padding(8)
+        .padding(12)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         .background(
-            RoundedRectangle(cornerRadius: 12, style: .continuous)
-                .fill(Color.black.opacity(0.05))
+            RoundedRectangle(cornerRadius: 8, style: .continuous)
+                .fill(Color(nsColor: .controlBackgroundColor))
         )
+    }
+
+    private func recentLogRow(_ entry: LogEntry) -> some View {
+        HStack(alignment: .firstTextBaseline, spacing: 10) {
+            Text(Self.logTimeFormatter.string(from: entry.timestamp))
+                .font(.system(.caption, design: .monospaced))
+                .foregroundStyle(.secondary)
+                .frame(width: 62, alignment: .leading)
+
+            Text(entry.level.rawValue)
+                .font(.system(.caption, design: .monospaced, weight: .semibold))
+                .foregroundStyle(logLevelColor(entry.level))
+                .frame(width: 42, alignment: .leading)
+
+            Text(entry.message)
+                .font(.system(.caption, design: .monospaced))
+                .lineLimit(2)
+                .textSelection(.enabled)
+                .frame(maxWidth: .infinity, alignment: .leading)
+        }
+        .padding(.vertical, 6)
+    }
+
+    private var selectedProcess: RunningProcess? {
+        guard let selectedProcessID = viewModel.selectedProcessID else { return nil }
+        return viewModel.processes.first { $0.id == selectedProcessID }
     }
 
     private var statusColor: Color {
         if viewModel.statusText.contains("错误") || viewModel.statusText.contains("退出") {
             return .red
-        } else if viewModel.statusText.contains("运行中") || viewModel.statusText.contains("监视中") {
+        } else if viewModel.statusText.contains("运行中") || viewModel.statusText.contains("监视中") || viewModel.statusText.contains("R:") {
             return .green
         } else {
             return .primary
+        }
+    }
+
+    private func logLevelColor(_ level: LogEntry.Level) -> Color {
+        switch level {
+        case .info:
+            return .secondary
+        case .warning:
+            return .orange
+        case .error:
+            return .red
         }
     }
 

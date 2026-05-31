@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		0838EB1A9245C2E0C8662737 /* LogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C7CABEA37173C9E717A324B /* LogView.swift */; };
 		2485B5024E73F2F06A770F79 /* Config.json in Resources */ = {isa = PBXBuildFile; fileRef = 702C5967E7B41F37B08E5615 /* Config.json */; };
 		3CCFFABD3C207301B0A6A102 /* PixelMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FDFBEE13B365CCC0E188E86 /* PixelMonitor.swift */; };
 		3CE37DADFDBB33EFB237B8A6 /* GeniusMacApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC910F5C322CE21B0004836C /* GeniusMacApp.swift */; };
@@ -27,7 +26,6 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		1C7CABEA37173C9E717A324B /* LogView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogView.swift; sourceTree = "<group>"; };
 		1E48C377E14FA6A37BE2DEF5 /* Config.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Config.swift; sourceTree = "<group>"; };
 		24CB15C6CAC5FF085C11F4B6 /* ConfigService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigService.swift; sourceTree = "<group>"; };
 		2CB480A5A75DE044AC325B26 /* KeyMapping.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyMapping.swift; sourceTree = "<group>"; };
@@ -73,7 +71,6 @@
 		6D8BFD354399E16BA82195E1 /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				1C7CABEA37173C9E717A324B /* LogView.swift */,
 				60D01687F2431B7B8A98AB58 /* MainView.swift */,
 				77B885E8BA88E7D5AB02AA35 /* SettingsView.swift */,
 			);
@@ -204,7 +201,6 @@
 				F280CD8B8F51B53C298345C9 /* KeyMapping.swift in Sources */,
 				C289FCDEA4B311D90C54383A /* KeySimulator.swift in Sources */,
 				D891BA88E6AFBBE598F17892 /* LogEntry.swift in Sources */,
-				0838EB1A9245C2E0C8662737 /* LogView.swift in Sources */,
 				908489F2AE87C4B05F5E44A4 /* MainView.swift in Sources */,
 				FDF6CAE8DF5C6BAB21D9F586 /* PermissionService.swift in Sources */,
 				3CCFFABD3C207301B0A6A102 /* PixelMonitor.swift in Sources */,

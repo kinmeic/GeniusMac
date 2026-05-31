@@ -10,7 +10,7 @@ struct GeniusMacApp: App {
                 .environmentObject(viewModel)
         }
         .windowStyle(.automatic)
-        .defaultSize(width: 448, height: 190)
+        .defaultSize(width: 860, height: 560)
         .windowResizability(.contentSize)
 
         Window("设置", id: "settings") {
@@ -19,11 +19,5 @@ struct GeniusMacApp: App {
         }
         .defaultSize(width: 640, height: 560)
         .windowResizability(.contentSize)
-
-        Window("日志", id: "logs") {
-            LogView()
-                .environmentObject(viewModel)
-        }
-        .defaultSize(width: 720, height: 480)
     }
 }

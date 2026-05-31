@@ -14,6 +14,7 @@ struct SettingsView: View {
 
     @State private var newColor: String = ""
     @State private var newKeyCode: String = ""
+    @State private var capturingKeyCodeID: String?
 
     var body: some View {
         VStack(spacing: 0) {
@@ -39,7 +40,7 @@ struct SettingsView: View {
                         VStack(alignment: .leading, spacing: 12) {
                             HStack {
                                 metricPill(title: "映射数量", value: "\(keyMappings.count)")
-                                metricPill(title: "示例", value: "R -> keyCode")
+                                metricPill(title: "示例", value: "R -> CGKeyCode")
                                 Spacer()
                             }
 
@@ -47,7 +48,7 @@ struct SettingsView: View {
                                 HStack {
                                     Text("颜色值 (R)")
                                         .frame(width: 120, alignment: .leading)
-                                    Text("按键码")
+                                    Text("虚拟键码")
                                         .frame(width: 120, alignment: .leading)
                                     Spacer()
                                     Text("操作")
@@ -72,9 +73,11 @@ struct SettingsView: View {
                                             Text(keyMappings[index].color)
                                                 .frame(width: 120, alignment: .leading)
                                                 .font(.system(.body, design: .rounded))
-                                            Text(keyMappings[index].keyCode)
-                                                .frame(width: 120, alignment: .leading)
-                                                .font(.system(.body, design: .rounded))
+                                            KeyCodeCaptureField(
+                                                text: bindingForKeyCode(at: index),
+                                                isFocused: bindingForKeyCapture(id: "mapping-\(keyMappings[index].color)")
+                                            )
+                                            .frame(width: 120, height: 24)
                                             Spacer()
                                             Button("删除") {
                                                 keyMappings.remove(at: index)
@@ -96,19 +99,27 @@ struct SettingsView: View {
                                     .fill(Color.black.opacity(0.04))
                             )
 
-                            HStack(spacing: 10) {
-                                TextField("颜色值", text: $newColor)
-                                    .textFieldStyle(.roundedBorder)
-                                    .frame(width: 130)
-                                TextField("按键码", text: $newKeyCode)
-                                    .textFieldStyle(.roundedBorder)
-                                    .frame(width: 130)
-                                Button("添加映射") {
-                                    addKeyMapping()
+                            VStack(alignment: .leading, spacing: 8) {
+                                HStack(spacing: 10) {
+                                    TextField("颜色值", text: $newColor)
+                                        .textFieldStyle(.roundedBorder)
+                                        .frame(width: 130)
+                                    KeyCodeCaptureField(
+                                        text: $newKeyCode,
+                                        isFocused: bindingForKeyCapture(id: "new")
+                                    )
+                                    .frame(width: 130, height: 24)
+                                    Button("添加映射") {
+                                        addKeyMapping()
+                                    }
+                                    .buttonStyle(.borderedProminent)
+                                    .disabled(newColor.isEmpty || newKeyCode.isEmpty)
+                                    Spacer()
                                 }
-                                .buttonStyle(.borderedProminent)
-                                .disabled(newColor.isEmpty || newKeyCode.isEmpty)
-                                Spacer()
+
+                                Text("这里使用 macOS 虚拟键码 CGKeyCode，不是 ASCII；例如 Enter = 36，Space = 49。")
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
                             }
                         }
                     }
@@ -183,6 +194,29 @@ struct SettingsView: View {
         }
         newColor = ""
         newKeyCode = ""
+        capturingKeyCodeID = nil
+    }
+
+    private func bindingForKeyCode(at index: Int) -> Binding<String> {
+        Binding(
+            get: {
+                guard keyMappings.indices.contains(index) else { return "" }
+                return keyMappings[index].keyCode
+            },
+            set: { newValue in
+                guard keyMappings.indices.contains(index) else { return }
+                keyMappings[index].keyCode = newValue
+            }
+        )
+    }
+
+    private func bindingForKeyCapture(id: String) -> Binding<Bool> {
+        Binding(
+            get: { capturingKeyCodeID == id },
+            set: { isFocused in
+                capturingKeyCodeID = isFocused ? id : (capturingKeyCodeID == id ? nil : capturingKeyCodeID)
+            }
+        )
     }
 
     private func settingsCard<Content: View>(
@@ -242,5 +276,119 @@ struct SettingsView: View {
             RoundedRectangle(cornerRadius: 10, style: .continuous)
                 .fill(Color.black.opacity(0.05))
         )
+    }
+}
+
+private struct KeyCodeCaptureField: NSViewRepresentable {
+    @Binding var text: String
+    @Binding var isFocused: Bool
+
+    func makeNSView(context: Context) -> CapturingKeyCodeView {
+        let view = CapturingKeyCodeView()
+        view.onFocusChange = { focused in
+            isFocused = focused
+        }
+        view.onKeyDown = { keyCode in
+            text = String(keyCode)
+            isFocused = false
+        }
+        return view
+    }
+
+    func updateNSView(_ nsView: CapturingKeyCodeView, context: Context) {
+        nsView.text = text
+        nsView.isCapturing = isFocused
+    }
+
+    final class CapturingKeyCodeView: NSView {
+        var onKeyDown: ((UInt16) -> Void)?
+        var onFocusChange: ((Bool) -> Void)?
+
+        var text: String = "" {
+            didSet { updateLabel() }
+        }
+
+        var isCapturing: Bool = false {
+            didSet { updateAppearance() }
+        }
+
+        private let label = NSTextField(labelWithString: "按一下按键")
+
+        override init(frame frameRect: NSRect) {
+            super.init(frame: frameRect)
+            wantsLayer = true
+
+            label.translatesAutoresizingMaskIntoConstraints = false
+            label.lineBreakMode = .byTruncatingTail
+            label.textColor = .placeholderTextColor
+            addSubview(label)
+
+            NSLayoutConstraint.activate([
+                label.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 8),
+                label.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -8),
+                label.centerYAnchor.constraint(equalTo: centerYAnchor)
+            ])
+
+            updateAppearance()
+        }
+
+        required init?(coder: NSCoder) {
+            nil
+        }
+
+        override var acceptsFirstResponder: Bool {
+            true
+        }
+
+        override func mouseDown(with event: NSEvent) {
+            window?.makeFirstResponder(self)
+        }
+
+        override func becomeFirstResponder() -> Bool {
+            isCapturing = true
+            onFocusChange?(true)
+            return true
+        }
+
+        override func resignFirstResponder() -> Bool {
+            isCapturing = false
+            onFocusChange?(false)
+            return true
+        }
+
+        override func keyDown(with event: NSEvent) {
+            guard event.keyCode != 53 else {
+                window?.makeFirstResponder(nil)
+                return
+            }
+
+            let keyCode = event.keyCode
+            text = String(keyCode)
+            onKeyDown?(keyCode)
+            window?.makeFirstResponder(nil)
+        }
+
+        override func viewDidMoveToWindow() {
+            super.viewDidMoveToWindow()
+            updateAppearance()
+        }
+
+        private func updateLabel() {
+            if text.isEmpty {
+                label.stringValue = isCapturing ? "请按键..." : "按一下按键"
+                label.textColor = .placeholderTextColor
+            } else {
+                label.stringValue = text
+                label.textColor = .labelColor
+            }
+        }
+
+        private func updateAppearance() {
+            layer?.cornerRadius = 6
+            layer?.backgroundColor = NSColor.textBackgroundColor.cgColor
+            layer?.borderWidth = isCapturing ? 2 : 1
+            layer?.borderColor = (isCapturing ? NSColor.controlAccentColor : NSColor.separatorColor).cgColor
+            updateLabel()
+        }
     }
 }
